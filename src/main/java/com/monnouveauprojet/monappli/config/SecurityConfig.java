@@ -56,18 +56,24 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
-                // 🚀 AJOUTE CETTE LIGNE (CRUCIAL POUR JWT)
                 .sessionManagement(session -> session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
+                        // 1. Accès public (Auth, Inscription et Photos)
                         .requestMatchers("/api/auth/**", "/api/login/**", "/api/register/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/annonces/**", "/uploads/**").permitAll()
 
-                        // 🛠️ Simplification pour être sûr de tout attraper
+                        // 2. 🛡️ SECTION ADMIN (Actions spécifiques : valider, gérer users, etc.)
+                        // On verrouille tout ce qui commence par /api/admin/
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                        // 3. Actions Propriétaires (POST, PUT, DELETE classiques)
+                        // On s'assure qu'ils sont au moins connectés
                         .requestMatchers(HttpMethod.POST, "/api/annonces/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/annonces/**").authenticated() // Capture tous les PUT sur annonces
+                        .requestMatchers(HttpMethod.PUT, "/api/annonces/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/annonces/**").authenticated()
 
+                        // 4. Le reste
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -76,7 +82,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 

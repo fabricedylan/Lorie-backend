@@ -10,17 +10,16 @@ public class AnnonceImmobiliere {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // ✅ Le champ est présent, il nous faut juste ses accès plus bas
+    private String statut = "EN_ATTENTE"; // Valeurs possibles : EN_ATTENTE, VALIDER, REJETER
+
     private String titre;
     private String description;
     private double prix;
     private String ville;
     private String adresse;
-
-    // ✅ nouveau champ pour l'image
     private String image;
 
-    // ✅ AJOUT DE LA RELATION AVEC L'UTILISATEUR
-    // FetchType.LAZY est recommandé pour les performances
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -40,6 +39,10 @@ public class AnnonceImmobiliere {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
+    // 🚀 AJOUT DES ACCÈS POUR LE STATUT (Pour corriger l'erreur de compilation)
+    public String getStatut() { return statut; }
+    public void setStatut(String statut) { this.statut = statut; }
+
     public String getTitre() { return titre; }
     public void setTitre(String titre) { this.titre = titre; }
 
@@ -58,7 +61,6 @@ public class AnnonceImmobiliere {
     public String getImage() { return image; }
     public void setImage(String image) { this.image = image; }
 
-    // ✅ NOUVEAU GETTER ET SETTER POUR L'UTILISATEUR
     public User getUser() { return user; }
     public void setUser(User user) { this.user = user; }
 }
